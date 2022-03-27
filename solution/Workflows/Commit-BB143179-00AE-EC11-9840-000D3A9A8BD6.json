@@ -1,0 +1,196 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_github": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "mppce_sharedgithub_62f87"
+        },
+        "api": {
+          "name": "shared_github"
+        }
+      },
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "mppce_sharedcommondataserviceforapps_cffc1"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "Repo Owner (mppce_repo_owner)": {
+          "defaultValue": "microsoft-power-platform-ce",
+          "type": "String",
+          "metadata": {
+            "schemaName": "mppce_repo_owner",
+            "description": "Owner (organization / user) of the GitHub repository to commit changes to"
+          }
+        },
+        "Repo Name (mppce_repo_name)": {
+          "defaultValue": "src-integration-github",
+          "type": "String",
+          "metadata": {
+            "schemaName": "mppce_repo_name",
+            "description": "Name of the GitHub Repository to commit changes to"
+          }
+        },
+        "Solution Name (mppce_solution_name)": {
+          "defaultValue": "mppce_src_integration_github",
+          "type": "String",
+          "metadata": {
+            "schemaName": "mppce_solution_name",
+            "description": "Name of the solution being actively developed in the current environment."
+          }
+        },
+        "Branch (mppce_branch)": {
+          "defaultValue": "main",
+          "type": "String",
+          "metadata": {
+            "schemaName": "mppce_branch",
+            "description": "Name of the branch to commit solution changes to."
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "07c2cc74-c494-4faf-b9d9-dce90ffac8e0"
+          },
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "Commit Message",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Create_a_repository_dispatch_event": {
+          "runAfter": {
+            "Get_Environment_URL": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "27d9e7f3-0540-4e01-9403-fdc85f8106a6"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_github",
+              "operationId": "CreateRepositoryDispatchEvent",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_github"
+            },
+            "parameters": {
+              "repositoryOwner": "@parameters('Repo Owner (mppce_repo_owner)')",
+              "repositoryName": "@parameters('Repo Name (mppce_repo_name)')",
+              "body/event_type": "commit",
+              "body/client_payload": {
+                "branch": "@{parameters('Branch (mppce_branch)')}",
+                "environment_url": "@{variables('Environment URL')}",
+                "message": "@{triggerBody()['text']}",
+                "solution_unique_name": "@{parameters('Solution Name (mppce_solution_name)')}"
+              }
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Get_Organization": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "f9c3f433-1c49-42ab-8473-bbdc4430fef0"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "ListRecords",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+            },
+            "parameters": {
+              "entityName": "organizations",
+              "$select": "organizationid",
+              "$top": 1
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Get_OData.Context": {
+          "runAfter": {
+            "Get_Organization": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "1f312625-0dd6-4096-8b5b-e1e95eb71874"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "OData.Context",
+                "type": "string",
+                "value": "@{outputs('Get_Organization')?['body/@odata.context']}"
+              }
+            ]
+          }
+        },
+        "Get_Environment_URL": {
+          "runAfter": {
+            "Get_OData.Context": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "fb1e8de4-f117-43e5-9951-271c5313be49"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Environment URL",
+                "type": "string",
+                "value": "@{substring(variables('OData.Context'), 0, indexOf(variables('OData.Context'), 'api/data/'))}"
+              }
+            ]
+          }
+        }
+      },
+      "outputs": {}
+    }
+  },
+  "schemaVersion": "1.0.0.0"
+}

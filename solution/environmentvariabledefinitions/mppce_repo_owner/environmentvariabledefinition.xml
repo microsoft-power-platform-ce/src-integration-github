@@ -1,0 +1,13 @@
+<environmentvariabledefinition schemaname="mppce_repo_owner">
+  <description default="Owner (organization / user) of the GitHub repository to commit changes to">
+    <label description="Owner (organization / user) of the GitHub repository to commit changes to" languagecode="1033" />
+  </description>
+  <displayname default="Repo Owner">
+    <label description="Repo Owner" languagecode="1033" />
+  </displayname>
+  <introducedversion>0.0.0.1</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

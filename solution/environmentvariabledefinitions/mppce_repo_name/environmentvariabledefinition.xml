@@ -1,0 +1,13 @@
+<environmentvariabledefinition schemaname="mppce_repo_name">
+  <description default="Name of the GitHub Repository to commit changes to">
+    <label description="Name of the GitHub Repository to commit changes to" languagecode="1033" />
+  </description>
+  <displayname default="Repo Name">
+    <label description="Repo Name" languagecode="1033" />
+  </displayname>
+  <introducedversion>0.0.0.1</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>
