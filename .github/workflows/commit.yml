@@ -1,0 +1,13 @@
+on:
+  repository_dispatch:
+    types: [commit]
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Output Payload
+        run: |
+          echo Solution: ${{ github.event.client_payload.solution_unique_name }}
+          echo Branch: ${{ github.event.client_payload.branch }}
