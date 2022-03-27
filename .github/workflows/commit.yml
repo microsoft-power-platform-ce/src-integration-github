@@ -7,7 +7,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Output Payload
-        run: |
-          echo Solution: ${{ github.event.client_payload.solution_unique_name }}
-          echo Branch: ${{ github.event.client_payload.branch }}
+        with:
+          ref: ${{ github.event.client_payload.branch }}
+      - name: Export Unmanaged
+        uses: microsoft/powerplatform-actions/export-solution@v0
+        with:
+          environment-url: ${{ github.event.client_payload.environment_url }}
+          app-id: ${{ secrets.CLIENT_ID }}
+          client-secret: ${{ secrets.CLIENT_SECRET }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          solution-name: ${{ github.event.client_payload.solution_unique_name }}
+          solution-output-file: solution.zip
+          run-asynchronously: true
+      - name: Export Managed
+        uses: microsoft/powerplatform-actions/export-solution@v0
+        with:
+          environment-url: ${{ github.event.client_payload.environment_url }}
+          app-id: ${{ secrets.CLIENT_ID }}
+          client-secret: ${{ secrets.CLIENT_SECRET }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          solution-name: ${{ github.event.client_payload.solution_unique_name }}
+          solution-output-file: solution_managed.zip
+          managed: true
+          run-asynchronously: true
+      - uses: microsoft/powerplatform-actions/unpack-solution@v0
+        with:
+          solution-file: solution.zip
+          solution-folder: solution
+          solution-type: Both
+      - uses: EndBug/add-and-commit@v9
