@@ -165,7 +165,7 @@
         },
         "Get_OData.Context": {
           "runAfter": {
-            "Get_Current_Solution_Version": [
+            "Get_Current_Major_Version": [
               "Succeeded"
             ]
           },
@@ -219,6 +219,26 @@
                 "name": "Current Solution Version",
                 "type": "string",
                 "value": "@{outputs('Get_Solution')?['body/value'][0]?['version']}"
+              }
+            ]
+          }
+        },
+        "Get_Current_Major_Version": {
+          "runAfter": {
+            "Get_Current_Solution_Version": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f1b1451c-6a78-4fb4-b7f1-4d8e61cbed55"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Current Major Version",
+                "type": "string",
+                "value": "@{split(variables('Current Solution Version'), '.')[0]}"
               }
             ]
           }
