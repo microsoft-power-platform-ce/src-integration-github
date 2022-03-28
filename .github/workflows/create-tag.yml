@@ -24,6 +24,6 @@ jobs:
         shell: pwsh
       - if: steps.check-for-new-version.outputs.is-new-version == 'True'
         name: Create Tag
-        run: |
-          Write-Host "creating new tag v${{ steps.get-solution-version.outputs.solution-version }}"
-        shell: pwsh
+        uses: EndBug/add-and-commit@v9
+        with:
+          tag: v${{ steps.get-solution-version.outputs.solution-version }}
