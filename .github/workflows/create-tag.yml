@@ -19,9 +19,11 @@ jobs:
           Write-Host "::set-output name=is-new-version::$(
             -Not $(
               $(
-                git ls-remote --tags origin |
-                  ForEach-Object { $_ -Replace "^[^`\s]*`\s*refs/tags/", "" }
-              ) ?? [string]::Empty).Contains(
+                $(
+                  git ls-remote --tags origin |
+                    ForEach-Object { $_ -Replace "^[^`\s]*`\s*refs/tags/", "" }
+                ) ?? [string]::Empty
+              ).Contains(
                 "v${{ steps.get-solution-version.outputs.solution-version }}"
               )
             )
