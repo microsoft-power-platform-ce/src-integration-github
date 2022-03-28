@@ -80,27 +80,32 @@
                   "title": "Commit Message",
                   "type": "string",
                   "x-ms-dynamically-added": true,
-                  "description": "Message to store in commit history",
+                  "description": "Message to appear in git commit history",
                   "x-ms-content-hint": "TEXT"
                 },
                 "text_1": {
                   "title": "Version Bump",
                   "type": "string",
                   "x-ms-dynamically-added": true,
-                  "description": "Which digit of the version to bump (Default: Revision)",
-                  "x-ms-content-hint": "TEXT",
+                  "description": "Solution version digit to bump (default: Revision)",
                   "enum": [
                     "Major",
                     "Minor",
                     "Build",
                     "Revision",
                     "Skip"
-                  ]
+                  ],
+                  "x-ms-content-hint": "TEXT"
                 }
               },
               "required": [
                 "text"
               ]
+            }
+          },
+          "runtimeConfiguration": {
+            "concurrency": {
+              "runs": 1
             }
           }
         }
