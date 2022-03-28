@@ -165,7 +165,7 @@
         },
         "Get_OData.Context": {
           "runAfter": {
-            "Get_Current_Revision_Version": [
+            "Condition": [
               "Succeeded"
             ]
           },
@@ -216,7 +216,7 @@
           "inputs": {
             "variables": [
               {
-                "name": "Current Solution Version",
+                "name": "Solution Version",
                 "type": "string",
                 "value": "@{outputs('Get_Solution')?['body/value'][0]?['version']}"
               }
@@ -236,9 +236,9 @@
           "inputs": {
             "variables": [
               {
-                "name": "Current Major Version",
+                "name": "Major Version",
                 "type": "integer",
-                "value": "@int(split(variables('Current Solution Version'), '.')[0])"
+                "value": "@int(split(variables('Solution Version'), '.')[0])"
               }
             ]
           }
@@ -256,9 +256,9 @@
           "inputs": {
             "variables": [
               {
-                "name": "Current Minor Version",
+                "name": "Minor Version",
                 "type": "integer",
-                "value": "@int(split(variables('Current Solution Version'), '.')[1])"
+                "value": "@int(split(variables('Solution Version'), '.')[1])"
               }
             ]
           }
@@ -276,9 +276,9 @@
           "inputs": {
             "variables": [
               {
-                "name": "Current Build Version",
+                "name": "Build Version",
                 "type": "integer",
-                "value": "@int(split(variables('Current Solution Version'), '.')[2])"
+                "value": "@int(split(variables('Solution Version'), '.')[2])"
               }
             ]
           }
@@ -290,18 +290,136 @@
             ]
           },
           "metadata": {
-            "operationMetadataId": "bab0ae87-60a9-4ef5-946f-830f7d7a00ef"
+            "operationMetadataId": "90c6bae3-734f-4bbc-ba8c-6ed8722fd4a0"
           },
           "type": "InitializeVariable",
           "inputs": {
             "variables": [
               {
-                "name": "Current Revision Version",
+                "name": "Revision Version",
                 "type": "integer",
-                "value": "@int(split(variables('Current Solution Version'), '.')[3])"
+                "value": "@int(split(variables('Solution Version'), '.')[3])"
               }
             ]
           }
+        },
+        "Condition": {
+          "actions": {
+            "Switch": {
+              "runAfter": {},
+              "cases": {
+                "Major_Bump": {
+                  "case": "Major",
+                  "actions": {
+                    "Minor_=_0": {
+                      "runAfter": {
+                        "Increment_Major": [
+                          "Succeeded"
+                        ]
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "Minor Version",
+                        "value": 0
+                      }
+                    },
+                    "Major_Bump_-_Build_=_0": {
+                      "runAfter": {
+                        "Minor_=_0": [
+                          "Succeeded"
+                        ]
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "Build Version",
+                        "value": 0
+                      }
+                    },
+                    "Major_Bump_-_Revision_=_0": {
+                      "runAfter": {
+                        "Major_Bump_-_Build_=_0": [
+                          "Succeeded"
+                        ]
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "Revision Version",
+                        "value": 0
+                      }
+                    },
+                    "Increment_Major": {
+                      "runAfter": {},
+                      "type": "IncrementVariable",
+                      "inputs": {
+                        "name": "Major Version"
+                      }
+                    }
+                  }
+                },
+                "Minor_Bump": {
+                  "case": "Minor",
+                  "actions": {
+                    "Minor_Bump_-_Build_=_0": {
+                      "runAfter": {
+                        "Increment_Minor": [
+                          "Succeeded"
+                        ]
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "Build Version",
+                        "value": 0
+                      }
+                    },
+                    "Minor_Bump_-_Revision_=_0": {
+                      "runAfter": {
+                        "Minor_Bump_-_Build_=_0": [
+                          "Succeeded"
+                        ]
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "Revision Version",
+                        "value": 0
+                      }
+                    },
+                    "Increment_Minor": {
+                      "runAfter": {},
+                      "type": "IncrementVariable",
+                      "inputs": {
+                        "name": "Minor Version"
+                      }
+                    }
+                  }
+                }
+              },
+              "default": {
+                "actions": {}
+              },
+              "expression": "@coalesce(triggerBody()?['text_1'], '')",
+              "metadata": {
+                "operationMetadataId": "b67e2ec4-43ff-4ef0-b309-55c351bcb6bc"
+              },
+              "type": "Switch"
+            }
+          },
+          "runAfter": {
+            "Get_Current_Revision_Version": [
+              "Succeeded"
+            ]
+          },
+          "expression": {
+            "not": {
+              "equals": [
+                "@triggerBody()?['text_1']",
+                "Skip"
+              ]
+            }
+          },
+          "metadata": {
+            "operationMetadataId": "b2eb9dbf-67ee-456e-9d4c-3905a46186cf"
+          },
+          "type": "If"
         }
       },
       "outputs": {}
