@@ -14,8 +14,13 @@ jobs:
       - id: get-solution-version
         uses: microsoft-power-platform-ce/actions/get-solution-version@main
       - id: check-for-new-version
+        name: Check if committed version already has a tag
         run: |
-          Write-Host "::set-output name=is-new-version::$(-Not $(git tag).Contains("v${{ steps.get-solution-version.outputs.solution-version }}")"
+          Write-Host "::set-output name=is-new-version::$(
+            -Not $(git tag).Contains(
+              "v${{ steps.get-solution-version.outputs.solution-version }}"
+            )
+          )"
         shell: pwsh
       - if: steps.check-for-new-version.outputs.is-new-version == 'True'
         name: Create Tag
