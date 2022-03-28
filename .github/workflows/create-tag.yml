@@ -34,4 +34,3 @@ jobs:
         run: |
           git tag v${{ steps.get-solution-version.outputs.solution-version }}
           git push --tags
- 
