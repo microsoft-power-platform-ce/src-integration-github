@@ -80,26 +80,26 @@
                   "title": "Commit Message",
                   "type": "string",
                   "x-ms-dynamically-added": true,
-                  "description": "Automated Commit",
+                  "description": "Message to store in commit history",
                   "x-ms-content-hint": "TEXT"
                 },
                 "text_1": {
                   "title": "Version Bump",
                   "type": "string",
                   "x-ms-dynamically-added": true,
-                  "description": "Revision",
+                  "description": "Which digit of the version to bump (Default: Revision)",
                   "enum": [
                     "Major",
                     "Minor",
                     "Build",
-                    "Revision"
+                    "Revision",
+                    "Skip"
                   ],
                   "x-ms-content-hint": "TEXT"
                 }
               },
               "required": [
-                "text",
-                "text_1"
+                "text"
               ]
             }
           }
@@ -165,7 +165,7 @@
         },
         "Get_OData.Context": {
           "runAfter": {
-            "Get_Solution": [
+            "Get_Current_Solution_Version": [
               "Succeeded"
             ]
           },
@@ -199,6 +199,26 @@
                 "name": "Environment URL",
                 "type": "string",
                 "value": "@{substring(variables('OData.Context'), 0, indexOf(variables('OData.Context'), 'api/data/'))}"
+              }
+            ]
+          }
+        },
+        "Get_Current_Solution_Version": {
+          "runAfter": {
+            "Get_Solution": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "038a343b-a74c-4818-8b67-7f87847ea328"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Current Solution Version",
+                "type": "string",
+                "value": "@{outputs('Get_Solution')?['body/value'][0]?['version']}"
               }
             ]
           }
