@@ -88,14 +88,14 @@
                   "type": "string",
                   "x-ms-dynamically-added": true,
                   "description": "Solution version digit to bump (default: Revision)",
+                  "x-ms-content-hint": "TEXT",
                   "enum": [
                     "Major",
                     "Minor",
                     "Build",
                     "Revision",
                     "Skip"
-                  ],
-                  "x-ms-content-hint": "TEXT"
+                  ]
                 }
               },
               "required": [
@@ -210,7 +210,7 @@
         },
         "Get_Current_Solution_Version": {
           "runAfter": {
-            "Apply_Version_Bump_Default_(Revision)": [
+            "Get_Solution_ID": [
               "Succeeded"
             ]
           },
@@ -457,6 +457,33 @@
                 "name": "Solution Version",
                 "value": "@{join(createArray(string(variables('Major Version')), string(variables('Minor Version')), string(variables('Build Version')), string(variables('Revision Version'))), '.')}"
               }
+            },
+            "Update_Solution_Version": {
+              "runAfter": {
+                "Combine_Bumped_Versions": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "59e92b2f-3bf2-4a00-b19c-6460fff6fa60"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_commondataserviceforapps",
+                  "operationId": "UpdateRecord",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                },
+                "parameters": {
+                  "entityName": "solutions",
+                  "recordId": "@variables('Solution ID')",
+                  "item/version": "@variables('Solution Version')"
+                },
+                "authentication": {
+                  "type": "Raw",
+                  "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                }
+              }
             }
           },
           "runAfter": {
@@ -493,6 +520,26 @@
                 "name": "Version Bump",
                 "type": "string",
                 "value": "@{coalesce(triggerBody()?['text_1'], 'Revision')}"
+              }
+            ]
+          }
+        },
+        "Get_Solution_ID": {
+          "runAfter": {
+            "Apply_Version_Bump_Default_(Revision)": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "51fce245-14da-4cad-a67d-b4cf34ffdea1"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Solution ID",
+                "type": "string",
+                "value": "@{outputs('Get_Solution')?['body/value'][0]?['solutionid']}"
               }
             ]
           }
