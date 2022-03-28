@@ -17,7 +17,11 @@ jobs:
         name: Check if committed version already has a tag
         run: |
           Write-Host "::set-output name=is-new-version::$(
-            -Not $($(git tag) ?? [string]::Empty).Contains(
+            -Not $(
+              $(
+                git ls-remote --tags origin |
+                  ForEach-Object { $_ -Replace "^[^`\s]*`\s*refs/tags/", "" }
+              ) ?? [string]::Empty).Contains(
               "v${{ steps.get-solution-version.outputs.solution-version }}" `
             )
           )"
