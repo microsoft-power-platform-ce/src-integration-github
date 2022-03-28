@@ -88,14 +88,14 @@
                   "type": "string",
                   "x-ms-dynamically-added": true,
                   "description": "Which digit of the version to bump (Default: Revision)",
+                  "x-ms-content-hint": "TEXT",
                   "enum": [
                     "Major",
                     "Minor",
                     "Build",
                     "Revision",
                     "Skip"
-                  ],
-                  "x-ms-content-hint": "TEXT"
+                  ]
                 }
               },
               "required": [
@@ -165,7 +165,7 @@
         },
         "Get_OData.Context": {
           "runAfter": {
-            "Get_Current_Major_Version": [
+            "Get_Current_Revision_Version": [
               "Succeeded"
             ]
           },
@@ -237,8 +237,68 @@
             "variables": [
               {
                 "name": "Current Major Version",
-                "type": "string",
-                "value": "@{split(variables('Current Solution Version'), '.')[0]}"
+                "type": "integer",
+                "value": "@int(split(variables('Current Solution Version'), '.')[0])"
+              }
+            ]
+          }
+        },
+        "Get_Current_Minor_Version": {
+          "runAfter": {
+            "Get_Current_Major_Version": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f1b1451c-6a78-4fb4-b7f1-4d8e61cbed55"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Current Minor Version",
+                "type": "integer",
+                "value": "@int(split(variables('Current Solution Version'), '.')[1])"
+              }
+            ]
+          }
+        },
+        "Get_Current_Build_Version": {
+          "runAfter": {
+            "Get_Current_Minor_Version": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f1b1451c-6a78-4fb4-b7f1-4d8e61cbed55"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Current Build Version",
+                "type": "integer",
+                "value": "@int(split(variables('Current Solution Version'), '.')[2])"
+              }
+            ]
+          }
+        },
+        "Get_Current_Revision_Version": {
+          "runAfter": {
+            "Get_Current_Build_Version": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "bab0ae87-60a9-4ef5-946f-830f7d7a00ef"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Current Revision Version",
+                "type": "integer",
+                "value": "@int(split(variables('Current Solution Version'), '.')[3])"
               }
             ]
           }
