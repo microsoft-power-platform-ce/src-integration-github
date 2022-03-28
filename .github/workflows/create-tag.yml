@@ -17,8 +17,8 @@ jobs:
         name: Check if committed version already has a tag
         run: |
           Write-Host "::set-output name=is-new-version::$(
-            -Not $($(git tag) ?? "").Contains(
-              "v${{ steps.get-solution-version.outputs.solution-version }}"
+            -Not $($(git tag) ?? [string]::Empty).Contains(
+              "v${{ steps.get-solution-version.outputs.solution-version }}" `
             )
           )"
         shell: pwsh
