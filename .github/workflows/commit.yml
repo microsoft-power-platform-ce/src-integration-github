@@ -1,6 +1,10 @@
+name: Commit
+
 on:
   repository_dispatch:
     types: [commit]
+
+concurrency: commit
 
 jobs:
   commit:
