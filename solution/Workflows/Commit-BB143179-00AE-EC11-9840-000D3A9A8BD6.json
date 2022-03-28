@@ -205,7 +205,7 @@
         },
         "Get_Current_Solution_Version": {
           "runAfter": {
-            "Get_Solution": [
+            "Apply_Version_Bump_Default_(Revision)": [
               "Succeeded"
             ]
           },
@@ -391,16 +391,67 @@
                       }
                     }
                   }
+                },
+                "Build_Bump": {
+                  "case": "Build",
+                  "actions": {
+                    "Increment_Build": {
+                      "runAfter": {},
+                      "type": "IncrementVariable",
+                      "inputs": {
+                        "name": "Build Version"
+                      }
+                    },
+                    "Build_Bump_-_Revision_=_0": {
+                      "runAfter": {
+                        "Increment_Build": [
+                          "Succeeded"
+                        ]
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "Revision Version",
+                        "value": 0
+                      }
+                    }
+                  }
+                },
+                "Revision_Bump": {
+                  "case": "Revision",
+                  "actions": {
+                    "Increment_Revision": {
+                      "runAfter": {},
+                      "type": "IncrementVariable",
+                      "inputs": {
+                        "name": "Revision Version"
+                      }
+                    }
+                  }
                 }
               },
               "default": {
                 "actions": {}
               },
-              "expression": "@coalesce(triggerBody()?['text_1'], '')",
+              "expression": "@variables('Version Bump')",
               "metadata": {
                 "operationMetadataId": "b67e2ec4-43ff-4ef0-b309-55c351bcb6bc"
               },
               "type": "Switch"
+            },
+            "Combine_Bumped_Versions": {
+              "runAfter": {
+                "Switch": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "7c2605cf-52c4-4fa5-a259-fab4de12c841"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "Solution Version",
+                "value": "@{concat(string(variables('Major Version')), string(variables('Minor Version')), string(variables('Build Version')), string(variables('Revision Version')))}"
+              }
             }
           },
           "runAfter": {
@@ -411,7 +462,7 @@
           "expression": {
             "not": {
               "equals": [
-                "@triggerBody()?['text_1']",
+                "@variables('Version Bump')",
                 "Skip"
               ]
             }
@@ -420,6 +471,26 @@
             "operationMetadataId": "b2eb9dbf-67ee-456e-9d4c-3905a46186cf"
           },
           "type": "If"
+        },
+        "Apply_Version_Bump_Default_(Revision)": {
+          "runAfter": {
+            "Get_Solution": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c57f6a5a-5235-4e9f-a9a4-ccb30a7eaabc"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Version Bump",
+                "type": "string",
+                "value": "@{coalesce(triggerBody()?['text_1'], 'Revision')}"
+              }
+            ]
+          }
         }
       },
       "outputs": {}
