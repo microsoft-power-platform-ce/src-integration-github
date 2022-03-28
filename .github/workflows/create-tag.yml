@@ -26,3 +26,4 @@ jobs:
         name: Create Tag
         run: |
           Write-Host "creating new tag v${{ steps.get-solution-version.outputs.solution-version }}"
+        shell: pwsh
