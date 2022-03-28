@@ -165,7 +165,7 @@
         },
         "Get_OData.Context": {
           "runAfter": {
-            "Condition": [
+            "Bump_Version_Check": [
               "Succeeded"
             ]
           },
@@ -303,9 +303,9 @@
             ]
           }
         },
-        "Condition": {
+        "Bump_Version_Check": {
           "actions": {
-            "Switch": {
+            "Switch_Version_Bump_Digit": {
               "runAfter": {},
               "cases": {
                 "Major_Bump": {
@@ -440,7 +440,7 @@
             },
             "Combine_Bumped_Versions": {
               "runAfter": {
-                "Switch": [
+                "Switch_Version_Bump_Digit": [
                   "Succeeded"
                 ]
               },
@@ -450,7 +450,7 @@
               "type": "SetVariable",
               "inputs": {
                 "name": "Solution Version",
-                "value": "@{concat(string(variables('Major Version')), string(variables('Minor Version')), string(variables('Build Version')), string(variables('Revision Version')))}"
+                "value": "@{join(createArray(string(variables('Major Version')), string(variables('Minor Version')), string(variables('Build Version')), string(variables('Revision Version'))), '.')}"
               }
             }
           },
