@@ -24,7 +24,7 @@ jobs:
                     ForEach-Object { $_ -Replace "^[^`\s]*`\s*refs/tags/", "" }
                 ) ?? [string]::Empty
               ).Contains(
-                "v${{ steps.get-solution-version.outputs.solution-version }}"
+                "v${{ steps.get-solution-version.outputs.solution-version }}" `
               )
             )
           )"
