@@ -111,7 +111,7 @@
         }
       },
       "actions": {
-        "Create_a_repository_dispatch_event": {
+        "Dispatch_Commit_to_GitHub": {
           "runAfter": {
             "Get_Environment_URL": [
               "Succeeded"

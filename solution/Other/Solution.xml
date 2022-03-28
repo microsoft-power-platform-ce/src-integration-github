@@ -6,7 +6,7 @@
       <LocalizedName description="Source Integration (GitHub)" languagecode="1033" />
     </LocalizedNames>
     <Descriptions />
-    <Version>0.0.0.2</Version>
+    <Version>0.0.1.0</Version>
     <Managed>2</Managed>
     <Publisher>
       <UniqueName>microsoft_power_platform_customer_engineers</UniqueName>
