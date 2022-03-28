@@ -80,12 +80,26 @@
                   "title": "Commit Message",
                   "type": "string",
                   "x-ms-dynamically-added": true,
-                  "description": "Please enter your input",
+                  "description": "Automated Commit",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_1": {
+                  "title": "Version Bump",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Revision",
+                  "enum": [
+                    "Major",
+                    "Minor",
+                    "Build",
+                    "Revision"
+                  ],
                   "x-ms-content-hint": "TEXT"
                 }
               },
               "required": [
-                "text"
+                "text",
+                "text_1"
               ]
             }
           }
@@ -125,7 +139,7 @@
             }
           }
         },
-        "Get_Organization": {
+        "Get_Solution": {
           "runAfter": {},
           "metadata": {
             "operationMetadataId": "f9c3f433-1c49-42ab-8473-bbdc4430fef0"
@@ -138,8 +152,9 @@
               "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
             },
             "parameters": {
-              "entityName": "organizations",
-              "$select": "organizationid",
+              "entityName": "solutions",
+              "$select": "solutionid,version",
+              "$filter": "uniquename eq '@{parameters('Solution Name (mppce_solution_name)')}'",
               "$top": 1
             },
             "authentication": {
@@ -150,7 +165,7 @@
         },
         "Get_OData.Context": {
           "runAfter": {
-            "Get_Organization": [
+            "Get_Solution": [
               "Succeeded"
             ]
           },
@@ -163,7 +178,7 @@
               {
                 "name": "OData.Context",
                 "type": "string",
-                "value": "@{outputs('Get_Organization')?['body/@odata.context']}"
+                "value": "@{outputs('Get_Solution')?['body/@odata.context']}"
               }
             ]
           }
