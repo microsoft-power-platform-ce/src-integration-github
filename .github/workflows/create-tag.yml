@@ -26,4 +26,5 @@ jobs:
         name: Create Tag
         uses: EndBug/add-and-commit@v9
         with:
+          push: v${{ steps.get-solution-version.outputs.solution-version }}
           tag: v${{ steps.get-solution-version.outputs.solution-version }}
